@@ -1,0 +1,114 @@
+#!/usr/bin/python3
+from math import*
+import sys
+
+def create_key():
+    size = ceil(sqrt(len(sys.argv[2])))
+    tab = [0] * size
+    for i in range(size):
+        tab[i] = [0] * size
+    i = 0
+    for j in range (size):
+        for l in range(size):
+            if i != len(sys.argv[2]):
+                tab[j][l] = ord(sys.argv[2][i])
+                i+=1
+    return tab
+
+
+def create_msg(key):
+    size = len(key)
+    lines = ceil(len(sys.argv[1])/size)
+    tab = [0] * lines
+    for i in range(lines):
+        tab[i] = [0] * size
+    i = 0
+    for j in range (lines):
+        for l in range(size):
+            if i != len(sys.argv[1]):
+                tab[j][l] = ord(sys.argv[1][i])
+                i+=1
+            
+    return tab
+
+def multiply_mat(mat1, mat2):
+    row = len(mat2[0])
+    line = len(mat2)
+    tab = [0] * line
+    for i in range(line):
+        tab[i] = [0] * row
+    for x in range(line):
+        for y in range(row):
+            total = 0
+            for z in range(row):
+                total += mat2[x][z] * mat1[z][y]
+            tab[x][y] = total
+    return (tab)
+
+def recup_msg(size):
+    lines = ceil(len(sys.argv[1])/size)
+    tab = [0] * lines
+    for i in range(lines):
+        tab[i] = [0] * size
+    i = 0
+    j = 0
+    for x in range(len(sys.argv[1])):
+        if sys.argv[1][x] == ' ' or sys.argv[1][x] == '\n':
+            x+=1
+            j+=1
+            if j == size:
+                i+=1
+                j = 0
+        tab[i][j] = str(tab[i][j]) + sys.argv[1][x]
+    x = lines -1
+    while tab[x][0] == 0:
+        tab.pop()
+        x-=1
+    for y in range (len(tab)):
+        for z in range(len(tab[0])):
+            tab[y][z] = int(tab[y][z])
+    return tab
+        
+
+def man():
+    if (len(sys.argv) == 2):
+        if (sys.argv[1] == "-h"):
+            print("USAGE")
+            print("\t./103cipher message fey flag")
+            print("\nDESCRIPTION")
+            print("\tmessage\ta message, made of ASCII characters")
+            print("\tkey\tthe encryption key, made of ASCII characters")
+            print("\tflag\t0 for the message to be encrypted, 1 to be decrypted")
+        else:
+            sys.exit(84)
+    elif (len(sys.argv) == 4):
+            mat1 = create_key()
+            print("Key matrix:")
+            if sys.argv[3] == '0':
+                mat2 = create_msg(mat1)
+                result = multiply_mat(mat1,mat2)
+                for i in range (len(mat1)):
+                    for j in range(len(mat1[0])):
+                        if j == len(mat1[0])-1:
+                            print(mat1[i][j], end='')
+                        else:
+                            print(mat1[i][j],'\t', end = '')
+                    print('')
+                print("\nEncrypted message:")
+                for i in range (len(result)):
+                        for j in range (len(result[0])):
+                            if i == len(result) - 1 and j == len(result[0]) - 1:
+                                print(result[i][j], end='')
+                            else:
+                                print(result[i][j], end=" ")
+                print("")
+            elif sys.argv[3] == '1':
+                mat2 = recup_msg(len(mat1))
+                result = multiply_mat(mat1,mat2)
+            else:
+                sys.exit(84)
+    else:   
+        sys.exit(84)
+
+
+man()
